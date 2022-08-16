@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -15,14 +18,43 @@ public class GatewayApplication {
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder){
 		return builder.routes()
-				.route("userSkillsByUserId", r ->	r.path("/userSkillsByUserId/**")
+				.route("userAndSkillsByUserId", r ->	r.path("/skill-tracker/api/v1/engineer/userAndSkillsByUserId/**")
 						.filters(f -> f
-								.rewritePath("/userSkillsByUserId/(?<segment>/?.*)","/userSkillCombiner/userSkillsByUserId/${segment}")
+								.rewritePath("/skill-tracker/api/v1/engineer/userAndSkillsByUserId/(?<segment>/?.*)","/userSkillCombiner/userAndSkillsByUserId/${segment}")
 								.addRequestHeader("skillTracker","Skill Tracker request")
 								.circuitBreaker(c -> c
 										.setName("skillTrackerCB")
 										.setFallbackUri("forward:/fallback")))
 						.uri("http://localhost:8083/"))
+				.route("userAndSkillsByUserName", r ->	r.path("/skill-tracker/api/v1/engineer/userAndSkillsByUserName/**")
+						.filters(f -> f
+								.rewritePath("/skill-tracker/api/v1/engineer/userAndSkillsByUserName/(?<segment>/?.*)","/userSkillCombiner/userAndSkillsByUserName/${segment}")
+								.circuitBreaker(c -> c
+										.setName("skillTrackerCB")
+										.setFallbackUri("forward:/fallback")))
+						.uri("http://localhost:8083/"))
+				.route("saveUserAndSkills", r ->	r.path("/skill-tracker/api/v1/engineer/add-profile")
+						.filters(f -> f
+								.rewritePath("/skill-tracker/api/v1/engineer/add-profile","/userSkillCombiner/saveUserAndSkills")
+								.addRequestHeader("skillTracker","Save Skill Tracker request")
+								.circuitBreaker(c -> c
+										.setName("skillTrackerCB")
+										.setFallbackUri("forward:/fallback")))
+						.uri("http://localhost:8083/"))
+				.route("updateUserAndSkills", r ->	r.path("/skill-tracker/api/v1/engineer/update-profile")
+						.filters(f -> f
+								.rewritePath("/skill-tracker/api/v1/engineer/update-profile","/userSkillCombiner/updateUserAndSkills")
+								.circuitBreaker(c -> c
+										.setName("skillTrackerCB")
+										.setFallbackUri("forward:/fallback")))
+						.uri("http://localhost:8083/"))
+				.route("searchUserAndSkills", r ->	r.path("/skill-tracker/api/v1/admin/criteria")
+						.filters(f -> f
+								.rewritePath("/skill-tracker/api/v1/admin/criteria","/userprofile/criteria")
+								.circuitBreaker(c -> c
+										.setName("skillTrackerCB")
+										.setFallbackUri("forward:/fallback")))
+						.uri("http://localhost:8086/"))
 				.route("users",r -> r.path("/users")
 						.filters(f-> f.rewritePath("/users","/userService/users"))
 						.uri("http://localhost:8081/"))
@@ -50,5 +82,6 @@ public class GatewayApplication {
 				.build();
 
 	}
+
 
 }
