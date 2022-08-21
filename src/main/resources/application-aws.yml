@@ -1,0 +1,37 @@
+server:
+  port: '8085'
+logging:
+  level:
+    org:
+      springframework:
+        web: TRACE
+        cloud:
+          gateway: TRACE
+    web: TRACE
+skill-service:
+  api:
+    uri: http://ec2-13-233-206-92.ap-south-1.compute.amazonaws.com:8082
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedHeaders: '*'
+            allowedMethods: GET, POST
+
+user-service:
+  api:
+    uri: http://ec2-13-233-206-92.ap-south-1.compute.amazonaws.com:8081
+user-skill-combiner:
+  api:
+    uri: http://ec2-15-206-84-52.ap-south-1.compute.amazonaws.com:8083
+mongo-service:
+  api:
+    uri: http://ec2-13-233-206-92.ap-south-1.compute.amazonaws.com:8086
+management:
+  endpoint:
+    web:
+      exposure:
+        includes: '"*'''
